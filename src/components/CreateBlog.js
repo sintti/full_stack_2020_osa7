@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
+import { useDispatch } from 'react-redux'
 
-const CreateBlog = ({ blogs, setBlogs, setNotification }) => {
+import { createNotification } from '../reducers/notificationReducer'
+import { createBlog } from '../reducers/blogReducer'
+import { Button, Form } from 'react-bootstrap'
+
+const CreateBlog = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const createBlog = async (event) => {
+  const dispatch = useDispatch()
+
+  const handleBlogCreate = async (event) => {
     event.preventDefault()
 
     const blog = {
@@ -16,59 +22,54 @@ const CreateBlog = ({ blogs, setBlogs, setNotification }) => {
     }
 
     try {
-      const response = await blogService.create(blog)
-      setBlogs(blogs.concat(response))
-      setNotification('Blog added succesfully.')
+      dispatch(createBlog(blog))
+      dispatch(createNotification('Blog added succesfully.'))
       setTitle('')
       setAuthor('')
       setUrl('')
-      setTimeout(() => {
-        setNotification('')
-      }, 5000)
     } catch (e) {
-      setNotification('Missing required information about blog')
+      dispatch(createNotification('Missing required information about blog'))
     }
-    setTimeout(() => {
-      setNotification('')
-    }, 5000)
   }
 
   return (
     <div className='create-blog'>
-      <h2>Create new blog</h2>
-      <form className='create-blog-form' onSubmit={createBlog}>
-        <div className='input-blog'>
+      <h2>Create a new blog</h2>
+      <Form className='create-blog-form' onSubmit={handleBlogCreate}>
+        <Form.Group>
+        <Form.Label className='input-blog'>
           Title:
-          <input
+          </Form.Label>
+          <Form.Control
             id='title'
             type='text'
             value={title}
             name='Title'
             onChange={({ target }) => setTitle(target.value)}
           />
-        </div>
-        <div className='input-blog'>
+        <Form.Label className='input-blog'>
           Author:
-          <input
+          </Form.Label>
+          <Form.Control
             id='author'
             type='text'
             value={author}
             name='Author'
             onChange={({ target }) => setAuthor(target.value)}
           />
-        </div>
-        <div className='input-blog'>
+        <Form.Label className='input-blog'>
           Url:
-          <input
+          </Form.Label>
+          <Form.Control
             id='url'
             type='text'
             value={url}
             name='Url'
             onChange={({ target }) => setUrl(target.value)}
           />
-        </div>
-        <button id='create-blog' type='submit'>Create</button>
-      </form>
+        <Button id='create-blog' type='submit'>Create</Button>
+        </Form.Group>
+      </Form>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import React from 'react'
-import Togglable from '../components/Togglable'
+import Togglable from './Togglable'
+import { Button } from 'react-bootstrap'
 
 const Blog = ({ blog, likeBlog, deleteBlog }) => {
 
@@ -11,15 +12,15 @@ const Blog = ({ blog, likeBlog, deleteBlog }) => {
         <li>{blog.url}</li>
         <li>
           <span id='likes'>{blog.likes}</span>
-          <button
+          <Button
             name='like'
             onClick={likeBlog}
-          >Like</button>
+          >Like</Button>
         </li>
-        <button
+        <Button
           name='delete'
           onClick={deleteBlog}
-        >Delete</button>
+        >Delete</Button>
       </Togglable>
     </ul>
   )

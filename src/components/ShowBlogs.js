@@ -1,62 +1,44 @@
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import Blog from './Blog'
-import blogService from '../services/blogs'
+import { createNotification } from '../reducers/notificationReducer'
+import { updateBlog, deleteBlog } from '../reducers/blogReducer'
 
-const ShowBlogs = ({ blogs, setBlogs, setNotification }) => {
-  const functionService = require('../functions/blogsSorter')
+const ShowBlogs = () => {
+  const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blog)
 
-  const likeBlog = async (blog) => {
+  const likeBlog = blog => {
     const updatedBlog = {
       ...blog,
       likes: blog.likes + 1
     }
     try {
-      const returnedBlog = await blogService.update(updatedBlog, updatedBlog.id)
-      setBlogs(
-        functionService.blogsSorter(
-          blogs.map(b => b.id !== blog.id ? b : returnedBlog)
-        ))
-      setNotification('Blog updated succesfully')
-      setTimeout(() => {
-        setNotification('')
-      }, 5000)
+      dispatch(updateBlog(updatedBlog))
+      dispatch(createNotification('Blog updated succesfully'))
     } catch (error) {
-      setNotification('update failed', error)
-    } setTimeout(() => {
-      setNotification('')
-    }, 5000)
+      dispatch(createNotification('update failed', error))
+    }
   }
 
-  const deleteBlog = async (id) => {
+  const handleDeleteBlog = id => {
     const blogToDelete = blogs.find(b => b.id === id)
-    const loggedUser = JSON.parse(localStorage.getItem('loggedBlogilistaUser')).username
-    if (loggedUser === blogToDelete.user.username) {
+    const loggedUser = JSON.parse(window.localStorage.getItem('loggedBlogilistaUser'))
+    if (loggedUser.username === blogToDelete.user.username) {
       const result = window.confirm(`Delete ${blogToDelete.title}?`)
-      if (result === true) {
+      if (result) {
         try {
-          await blogService.remove(id)
-          setBlogs(
-            functionService.blogsSorter(
-              blogs.filter(b => b.id !== id)
-            ))
-          setNotification('Blog deleted succesfully')
-          setTimeout(() => {
-            setNotification('')
-          }, 5000)
+          dispatch(deleteBlog(id))
+          dispatch(createNotification('Blog deleted succesfully'))
         } catch (error) {
-          setNotification('Blog was already deleted')
-        } setTimeout(() => {
-          setNotification('')
-        }, 5000)
+          dispatch(createNotification('Blog was already deleted'))
+        }
       }
     } else {
-      setNotification('Cannot delete blogs saved by another user')
-    } setTimeout(() => {
-      setNotification('')
-    }, 5000)
+      dispatch(createNotification('Cannot delete blogs saved by another user'))
+    }
   }
-
-
 
   return (
     <div className="blogs">
@@ -66,7 +48,7 @@ const ShowBlogs = ({ blogs, setBlogs, setNotification }) => {
           key={blog.id}
           blog={blog}
           likeBlog={() => likeBlog(blog)}
-          deleteBlog={() => deleteBlog(blog.id)}
+          deleteBlog={() => handleDeleteBlog(blog.id)}
         />
       )}
     </div>

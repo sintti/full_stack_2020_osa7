@@ -1,62 +1,61 @@
 import React, { useState } from 'react'
-import loginService from '../services/login'
-import blogService from '../services/blogs'
+import { useDispatch } from 'react-redux'
+import { Button, Form } from 'react-bootstrap'
 
-const LoginForm = ({ setUser, setNotification }) => {
+import { loginUser } from '../reducers/loginReducer'
+import { createNotification } from '../reducers/notificationReducer'
+
+const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const dispatch = useDispatch()
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({
-        username, password
-      })
-
-      window.localStorage.setItem(
-        'loggedBlogilistaUser', JSON.stringify(user)
-      )
-      blogService.setToken(user.token)
-      setUser(user)
+      dispatch(loginUser({
+        username: username,
+        password: password
+      }))
       setUsername('')
       setPassword('')
     } catch (e) {
-      setNotification('Username or password wrong')
+      dispatch(createNotification('Username or password wrong'))
       setUsername('')
       setPassword('')
     }
-    setTimeout(() => {
-      setNotification('')
-    }, 5000)
   }
 
   return (
-    <div className="login-form">
+    <div className="container">
       <h2>Log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
+      <Form onSubmit={handleLogin}>
+        <Form.Group>
+        <Form.Label>
             Username
-          <input
+          <Form.Control
             id='username'
             type="text"
             value={username}
             name="Username"
             onChange={({ target }) => setUsername(target.value)}
           />
-        </div>
-        <div>
+        </Form.Label>
+        <Form.Label>
             Password
-          <input
+          <Form.Control
             id='password'
             type="password"
             value={password}
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />
-        </div>
-        <button id='login-button' type="submit">Login</button>
-      </form>
+        </Form.Label>
+        <Button id='login-button' type="submit">Login</Button>
+        </Form.Group>
+      </Form>
     </div>
   )
 }

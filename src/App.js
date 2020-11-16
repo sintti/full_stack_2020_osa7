@@ -1,84 +1,73 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {Switch, Route, useRouteMatch } from 'react-router-dom'
+
 import blogService from './services/blogs'
 import Notification from './components/Notification'
 import ShowBlogs from './components/ShowBlogs'
 import LoginForm from './components/LoginForm'
-import LogoutForm from './components/LogoutForm'
+import Menu from './components/Menu'
 import CreateBlog from './components/CreateBlog'
 import Togglable from './components/Togglable'
+import Users from './components/Users'
+import User from './components/User'
+import { initializeBlogs } from './reducers/blogReducer'
+import { setUserFromLocalStorage } from './reducers/loginReducer'
+import { intializeUsers } from './reducers/usersReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState('')
-  const functionService = require('./functions/blogsSorter')
+  const dispatch = useDispatch()
+  const loggedUser = useSelector(state => state.login)
+  const users = useSelector(state => state.users)
 
+  // Get initial blogs from db
   useEffect(() => {
-    blogService
-      .getAll()
-      .then(blogs =>
-        setBlogs( functionService.blogsSorter(blogs) )
-      )
-  }, [functionService])
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
+  
+  // Keep user logged after refresh
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogilistaUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(setUserFromLocalStorage(user))
       blogService.setToken(user.token)
     }
-  }, [])
+  }, [dispatch])
+  
+  // Get initial userinfo from db
+  useEffect(() => {
+    dispatch(intializeUsers())
+  }, [dispatch])
 
-  if (user === null) {
+  if (!loggedUser) {
     return (
-      <div className="login-form">
-
-        <div className='header'>
-          <h1>Blogilista</h1>
-          <Notification message={notification} />
-        </div>
-
-        <div className='container'>
-          <LoginForm
-            user={user}
-            setUser={setUser}
-            setNotification={setNotification}
-          />
-        </div>
-
+      <div className='container'>
+          <Notification />
+          <LoginForm />
       </div>
     )
   }
 
   return (
-    <div>
-      <div className='header'>
-
-        <h1>Blogilista</h1>
-
-        <LogoutForm user={user} />
-
-      </div>
-
-      <Notification message={notification} />
-
-      <div className='container'>
-        <Togglable buttonLabel='Create blog' secondButtonLabel='Cancel'>
-          <CreateBlog
-            blogs={blogs}
-            setBlogs={setBlogs}
-            setNotification={setNotification}
-          />
-        </Togglable>
-
-        <ShowBlogs
-          blogs={blogs}
-          setBlogs={setBlogs}
-          setNotification={setNotification}
-        />
-      </div>
-
+    <div className='container'>
+        <Menu />
+        <Notification />
+        <Switch>
+          <Route path='/users/:id'>
+            <User users={users}/>
+          </Route>
+          <Route path='/blogs'>
+            <Togglable buttonLabel='Create blog' secondButtonLabel='Cancel'>
+              <CreateBlog />
+            </Togglable>
+            <ShowBlogs />
+          </Route>
+          <Route path='/users'>
+            <Users />
+          </Route>
+        </Switch>
     </div>
   )
 }
