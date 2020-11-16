@@ -45,6 +45,16 @@ export const updateBlog = blog => {
   }
 }
 
+export const commentBlog = blog => {
+  return async dispatch => {
+    const updatedBlog = await blogService.comment(blog)
+    dispatch({
+      type: 'UPDATE_BLOG',
+      data: updatedBlog
+    })
+  }
+}
+
 export const deleteBlog = id => {
   return async dispatch => {
     await blogService.remove(id)

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, Nav, Navbar } from 'react-bootstrap'
+import { Nav, Navbar } from 'react-bootstrap'
 
 const Menu = () => {
   const loggedUser = useSelector(state => state.login)

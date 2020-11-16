@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {Switch, Route, useRouteMatch } from 'react-router-dom'
+import {Switch, Route } from 'react-router-dom'
 
 import blogService from './services/blogs'
 import Notification from './components/Notification'
@@ -11,6 +11,7 @@ import CreateBlog from './components/CreateBlog'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
 import User from './components/User'
+import Blog from './components/Blog'
 import { initializeBlogs } from './reducers/blogReducer'
 import { setUserFromLocalStorage } from './reducers/loginReducer'
 import { intializeUsers } from './reducers/usersReducer'
@@ -57,6 +58,9 @@ const App = () => {
         <Switch>
           <Route path='/users/:id'>
             <User users={users}/>
+          </Route>
+          <Route path='/blogs/:id'>
+            <Blog />
           </Route>
           <Route path='/blogs'>
             <Togglable buttonLabel='Create blog' secondButtonLabel='Cancel'>

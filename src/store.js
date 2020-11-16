@@ -9,7 +9,7 @@ const reducer = combineReducers({
   users: usersReducer,
   login: loginReducer,
   notification: notificationReducer,
-  blog: blogReducer
+  blogs: blogReducer
 })
 
 const store = createStore(

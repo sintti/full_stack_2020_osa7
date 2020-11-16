@@ -54,6 +54,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
     author: body.author,
     url: body.url,
     likes: body.likes === undefined ? 0 : body.likes,
+    comments: body.comments,
     user: user._id
   })
 
@@ -65,6 +66,21 @@ blogsRouter.put('/:id', async (request, response, next) => {
       response.json(updatedBlog.toJSON())
     })
     .catch(e => next(e))
+})
+
+blogsRouter.put('/:id/comments', async (request, response) => {
+  const body = request.body
+
+  const blog = ({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes === undefined ? 0 : body.likes,
+    comments: body.comments,
+  })
+
+  const updatedBlog = await Blog.findByIdAndUpdate(body.id, blog, { new: true })
+  response.json((updatedBlog).toJSON())
 })
 
 blogsRouter.delete('/:id', async (request, response) => {

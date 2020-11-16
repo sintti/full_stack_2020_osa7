@@ -35,10 +35,18 @@ const update = async blog => {
   return response.data
 }
 
+const comment = async blog => {
+  const response = await axios.put(
+    `${baseUrl}/${blog.id}/comments`,
+    blog
+  )
+  return response.data
+}
+
 const remove = async (id) => {
   const response = await axios.delete(`${baseUrl}/${id}`)
   return response.data
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, create, setToken, update, remove }
+export default { getAll, create, setToken, update, remove, comment }
